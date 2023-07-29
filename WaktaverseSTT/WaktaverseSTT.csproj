@@ -9,11 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Apis" Version="1.61.0" />
-    <PackageReference Include="Google.Apis.Auth" Version="1.61.0" />
     <PackageReference Include="Google.Cloud.Speech.V1" Version="3.4.0" />
-    <PackageReference Include="Google.Cloud.Storage.V1" Version="4.6.0" />
     <PackageReference Include="NAudio" Version="2.1.0" />
+    <PackageReference Include="naudio.winforms" Version="2.1.0" />
   </ItemGroup>
 
 </Project>

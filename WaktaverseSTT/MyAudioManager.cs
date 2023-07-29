@@ -1,14 +1,17 @@
 ﻿using NAudio.Wave;
+using System.Diagnostics;
 
-namespace STTConsole
+namespace WaktaverseSTT
 {
     internal class MyAudioManager
     {
-        private BufferedWaveProvider waveBuffer;
-        private WaveInEvent waveInEvent;
-        int valuableLength;
-
-        public MyAudioManager()
+        public BufferedWaveProvider waveBuffer;
+        public WaveInEvent waveInEvent;
+        public event EventHandler<SentenceEventArgs> SendSentense;
+        
+        // for test
+        int count = 0;
+        internal MyAudioManager()
         {
             waveInEvent = new WaveInEvent
             {
@@ -17,7 +20,7 @@ namespace STTConsole
             };
 
             waveInEvent.DataAvailable += WaveIn_DataAvailable;
-
+            
             waveBuffer = new BufferedWaveProvider(waveInEvent.WaveFormat)
             {
                 // BufferLength = waveInEvent.waveFormat.AverageBytesPerSecond * 5;
@@ -25,11 +28,21 @@ namespace STTConsole
                 DiscardOnBufferOverflow = true,
             };
 
+            
         }
-        private void WaveIn_DataAvailable(object sender, WaveInEventArgs e)
+        private void WaveIn_DataAvailable(object? sender, WaveInEventArgs e)
         {
+            // for test
+            count++;
+
             this.waveBuffer.AddSamples(e.Buffer, 0, e.BytesRecorded);
-            valuableLength += e.BytesRecorded;
+
+
+            if(100 < count)
+            {
+                // mute
+                SendSentense(this, new SentenceEventArgs());
+            }
         }
 
 
@@ -46,15 +59,9 @@ namespace STTConsole
         public int ReadRecording(byte[] buffer, int offset, int count)
         {
             int ret = this.waveBuffer.Read(buffer, offset, count);
-            valuableLength = 0;//67200 // 76800
             // this.waveBuffer.ClearBuffer();
 
             return ret;
-        }
-
-        public int GetValuableBufferLength()
-        {
-            return this.valuableLength;
         }
 
         public void WriteFile(string fileName, byte[] buffer, int length)
@@ -64,15 +71,42 @@ namespace STTConsole
             waveFileWriter.Dispose();
         }
 
-        public byte[] ReadFile(string fileName)
+        public byte[]? ReadWave(string fileName)
         {
             WaveFileReader waveFileReader = new WaveFileReader(fileName);
-            
-            byte[] buffer = new byte[waveFileReader.Length];
-            waveFileReader.Read(buffer, 0, buffer.Length);
-            waveFileReader.Close();
+            byte[]? buffer = null;
+            if (0 < waveFileReader.Length)
+            {
+                buffer = new byte[waveFileReader.Length];
+                waveFileReader.Read(buffer, 0, buffer.Length);
+                waveFileReader.Close();
+            }
 
             return buffer;
+        }
+
+        public byte[]? ReadMp3(string filePath)
+        {
+            Mp3FileReader reader = new Mp3FileReader(filePath);
+            byte[]? buffer = null;
+            if (0 < reader.Length)
+            {
+                buffer = new byte[reader.Length];
+                reader.Read(buffer, 0, buffer.Length);
+                reader.Close();
+            }
+
+            return buffer;
+        }
+    }
+
+
+    public class SentenceEventArgs : EventArgs
+    {
+        [DebuggerStepThrough]
+        public SentenceEventArgs()
+        {
+           
         }
     }
 }

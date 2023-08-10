@@ -99,7 +99,7 @@ namespace STTConsole // Note: actual namespace depends on the project name.
                     {
                         foreach (var result in streamingCall.GetResponseStream().Current.Results)
                         {
-                            //Console.WriteLine($"뭐지이건: {result.Alternatives} {result.IsFinal} {result.Stability}  {result.ResultEndTime} {result.ChannelTag} {result.LanguageCode}");
+                            Console.WriteLine($"뭐지이건: {result.Alternatives} {result.IsFinal} {result.Stability}  {result.ResultEndTime} {result.ChannelTag} {result.LanguageCode}");
                             if(0.5f <= result.Stability || result.IsFinal)
                             {
                                 foreach (var alternative in result.Alternatives)

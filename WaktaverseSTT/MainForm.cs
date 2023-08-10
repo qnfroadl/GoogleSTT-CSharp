@@ -97,7 +97,7 @@ namespace WaktaverseSTT
         private void WaveIn_DataAvailable(object? sender, WaveInEventArgs e)
         {
             //Console.WriteLine(DateTime.Now.ToString("HH:mm:ss.fff"));
-            // 오디오 버퍼를 스트리밍으로 전송합니다.
+            // 오디오 버퍼를 스트리밍으로 전송
             streamingRecognize.WriteAsync(new StreamingRecognizeRequest()
             {
                 AudioContent = ByteString.CopyFrom(e.Buffer, 0, e.Buffer.Length)
@@ -163,14 +163,10 @@ namespace WaktaverseSTT
                 speech = SpeechClient.Create();
                 streamingRecognize = speech.StreamingRecognize();
 
-                // 인식하고자 하는 단어 리스트를 설정합니다.
-               
-                // SpeechContext에 단어 리스트를 추가합니다.
-                SpeechContext speechContext = new SpeechContext();
-                speechContext.Phrases.AddRange(new string[] { "사과", "바나나", "크루시오", "엑스펠리아르무스"});
-                speechContext.Boost = 20;
-
-
+                // SpeechContext에 단어 리스트를 추가
+                //SpeechContext speechContext = new SpeechContext();
+                //speechContext.Phrases.AddRange(new string[] { "사과", "바나나", "크루시오", "엑스펠리아르무스"});
+                //speechContext.Boost = 20;
 
                 StreamingRecognizeRequest request = new StreamingRecognizeRequest()
                 {
@@ -182,7 +178,7 @@ namespace WaktaverseSTT
                             SampleRateHertz = 16000,
                             LanguageCode = LanguageCodes.Korean.SouthKorea, // 인식할 언어 코드를 설정합니다.
                             Model = "latest_long",//"latest_long",
-                            SpeechContexts = { speechContext },
+                            // SpeechContexts = { speechContext },
                         },
 
                         InterimResults = true,
@@ -194,6 +190,8 @@ namespace WaktaverseSTT
 
                 Task printResponses = Task.Run(async () =>
                 {
+                    // 중복된 결과를 response하고 있기 때문에 매칭되는 문자열이 한번 확인되면 그뒤로는 확인하지 않도록
+                    bool bSendKey = false;
                     while (await streamingRecognize.GetResponseStream().MoveNextAsync(default))
                     {
                         foreach (var result in streamingRecognize.GetResponseStream().Current.Results)
@@ -202,37 +200,33 @@ namespace WaktaverseSTT
                             {
                                 foreach (var alternative in result.Alternatives)
                                 {
-                                    if (alternative.Transcript.Replace(" ", "").Contains("점프"))
+                                    if (false == bSendKey)
                                     {
-                                        // SendKeys.SendWait("t");
+                                        // 문자열 비교 (.txt파일에서 읽어온 목록을 이용해서 비교하고, SendKey까지 처리되도록)
+                                        if(alternative.Transcript.Replace(" ", "").Contains("점프"))
+                                        {
+                                            bSendKey = true;
+                                            //SendKeys.SendWait(Keys.Space.ToString());
+                                            SendKeys.SendWait("t");
+                                        }
                                     }
 
-                                    if (listBox1.Items.Count == resultNum)
+                                    listBox1.Invoke((MethodInvoker)delegate
                                     {
-                                        listBox1.Invoke((MethodInvoker)delegate
+                                        if (listBox1.Items.Count == resultNum)
                                         {
-                                            listBox1.Items.Add(alternative.Transcript.TrimStart());
-                                            listBox1.TopIndex = listBox1.Items.Count - 1;
-                                        });
-                                    }
-                                    else
-                                    {
-                                        listBox1.Invoke((MethodInvoker)delegate
-                                        {
-                                            listBox1.Items[resultNum] = alternative.Transcript.TrimStart();
-                                            listBox1.TopIndex = listBox1.Items.Count - 1;
-                                        });
-                                    }
-
-                                    if (result.IsFinal)
-                                    {
-                                        //listBox1.Invoke((MethodInvoker)delegate
-                                        //{
-                                        //    listBox1.Items[resultNum] = alternative.Transcript.TrimStart();
-                                        //});
-                                        resultNum++;
-                                    }
+                                            listBox1.Items.Add("");
+                                        }
+                                        listBox1.Items[resultNum] = alternative.Transcript.TrimStart();
+                                        listBox1.TopIndex = listBox1.Items.Count - 1;
+                                    });
                                 }
+                            }
+
+                            if (result.IsFinal)
+                            {
+                                bSendKey = false;
+                                resultNum++;
                             }
                         }
                     }
@@ -245,16 +239,17 @@ namespace WaktaverseSTT
                 this.statusLabel1.Text = "실시간 TTS 진행중";
                 this.micButton.Text = "Monitoring Stop";
                 this.isMonitoring = true;
+                this.fileSTTTestButton.Enabled = false;
+
             }
             else
             {
                 // 중지하기.
                 waveIn.StopRecording();
                 streamingRecognize.WriteCompleteAsync();
-
-                // 중단 성공시.(근데 이건 무조건이지) 
                 this.micButton.Text = "Monitoring Start";
                 this.isMonitoring = false;
+                this.fileSTTTestButton.Enabled = true;
 
             }
         }

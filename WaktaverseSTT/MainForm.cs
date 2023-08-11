@@ -8,6 +8,8 @@ namespace WaktaverseSTT
 {
     public partial class MainForm : Form
     {
+        const string ttsRunning = "실시간 TTS 진행중";
+
         bool isMonitoring = false;
 
         WaveIn waveIn;
@@ -15,11 +17,14 @@ namespace WaktaverseSTT
 
         SpeechClient speech;
         StreamingRecognizeStream streamingRecognize;
+        TextToKey ttk;
 
         int resultNum = 0;
         public MainForm()
         {
             InitializeComponent();
+            ttk = new TextToKey();
+            ttk.Init("C:\\Users\\qnfro\\GitHub\\GoogleSTT-CSharp\\ttk.info");
 
             // Set GoogleAPI Key
             //Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "./waktaversestt-195be6d5847e.json");
@@ -51,7 +56,6 @@ namespace WaktaverseSTT
                 this.pathLabel.Text = openFileDialog1.FileName;
             }
         }
-
 
         private void MainForm_SizeChanged(object sender, EventArgs e)
         {
@@ -192,22 +196,34 @@ namespace WaktaverseSTT
                 {
                     // 중복된 결과를 response하고 있기 때문에 매칭되는 문자열이 한번 확인되면 그뒤로는 확인하지 않도록
                     bool bSendKey = false;
+                    int key;
                     while (await streamingRecognize.GetResponseStream().MoveNextAsync(default))
                     {
                         foreach (var result in streamingRecognize.GetResponseStream().Current.Results)
                         {
+                            // begin test
+                            //foreach (var alternative in result.Alternatives)
+                            //{
+                            //    listBox1.Invoke((MethodInvoker)delegate
+                            //    {
+                            //        listBox1.Items.Add(result.Stability.ToString() + ", " + result.IsFinal + ", " + alternative.Transcript.TrimStart());
+                            //    });
+                            //}
+                            //end test
+
+                            
                             if (0.5f <= result.Stability || result.IsFinal)
                             {
                                 foreach (var alternative in result.Alternatives)
                                 {
                                     if (false == bSendKey)
                                     {
-                                        // 문자열 비교 (.txt파일에서 읽어온 목록을 이용해서 비교하고, SendKey까지 처리되도록)
-                                        if(alternative.Transcript.Replace(" ", "").Contains("점프"))
+                                        key = ttk.GetKey(alternative.Transcript.Replace(" ", ""));
+                                        if (0 != key)
                                         {
                                             bSendKey = true;
-                                            //SendKeys.SendWait(Keys.Space.ToString());
-                                            SendKeys.SendWait("t");
+                                            InputKeyboard.SendKeyDown((InputKeyboard.KeyCode)key);
+                                            this.statusLabel1.Text = ttsRunning + ", SendKey: 0x" + key.ToString("x");
                                         }
                                     }
 
@@ -228,6 +244,7 @@ namespace WaktaverseSTT
                                 bSendKey = false;
                                 resultNum++;
                             }
+                            
                         }
                     }
 
@@ -236,7 +253,7 @@ namespace WaktaverseSTT
 
                 // 모니터링 시작하기
                 waveIn.StartRecording();
-                this.statusLabel1.Text = "실시간 TTS 진행중";
+                this.statusLabel1.Text = ttsRunning;
                 this.micButton.Text = "Monitoring Stop";
                 this.isMonitoring = true;
                 this.fileSTTTestButton.Enabled = false;

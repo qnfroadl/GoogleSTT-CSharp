@@ -23,14 +23,13 @@ namespace WaktaverseSTT
         public MainForm()
         {
             InitializeComponent();
+
             ttk = new TextToKey();
-            ttk.Init("C:\\Users\\qnfro\\GitHub\\GoogleSTT-CSharp\\ttk.info");
+            ttk.Init("./ttk.info");
 
             // Set GoogleAPI Key
-            //Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "./waktaversestt-195be6d5847e.json");
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "C:\\Users\\qnfro\\License\\waktaversestt-195be6d5847e.json");
+            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "./waktaversestt-195be6d5847e.json");
 
-            volumeMeter1.Amplitude = 3f;
             openFileDialog1.Filter = "wav 파일|*.wav|모든 파일|*.*";
 
             waveIn = new WaveIn
@@ -57,11 +56,6 @@ namespace WaktaverseSTT
             }
         }
 
-        private void MainForm_SizeChanged(object sender, EventArgs e)
-        {
-            //window 사이즈 변경시 컨트롤들 업데이트
-            volumeMeter1.Invalidate();
-        }
 
         private void fileSTTTestButton_Click(object sender, EventArgs e)
         {
@@ -211,7 +205,7 @@ namespace WaktaverseSTT
                             //}
                             //end test
 
-                            
+
                             if (0.5f <= result.Stability || result.IsFinal)
                             {
                                 foreach (var alternative in result.Alternatives)
@@ -222,7 +216,7 @@ namespace WaktaverseSTT
                                         if (0 != key)
                                         {
                                             bSendKey = true;
-                                            InputKeyboard.SendKeyDown((InputKeyboard.KeyCode)key);
+                                            InputKeyboard.SendKeyPress((InputKeyboard.KeyCode)key);
                                             this.statusLabel1.Text = ttsRunning + ", SendKey: 0x" + key.ToString("x");
                                         }
                                     }
@@ -244,7 +238,7 @@ namespace WaktaverseSTT
                                 bSendKey = false;
                                 resultNum++;
                             }
-                            
+
                         }
                     }
 

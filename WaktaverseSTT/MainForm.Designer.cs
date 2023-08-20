@@ -34,7 +34,6 @@
             label1 = new Label();
             pathLabel = new Label();
             fileSTTTestButton = new Button();
-            volumeMeter1 = new NAudio.Gui.VolumeMeter();
             listBox1 = new ListBox();
             statusStrip1 = new StatusStrip();
             statusLabel1 = new ToolStripStatusLabel();
@@ -47,7 +46,7 @@
             micButton.Font = new Font("맑은 고딕", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
             micButton.Location = new Point(12, 64);
             micButton.Name = "micButton";
-            micButton.Size = new Size(678, 72);
+            micButton.Size = new Size(420, 72);
             micButton.TabIndex = 4;
             micButton.Text = "Monitoring Start";
             micButton.UseVisualStyleBackColor = true;
@@ -81,7 +80,7 @@
             pathLabel.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             pathLabel.Location = new Point(62, 38);
             pathLabel.Name = "pathLabel";
-            pathLabel.Size = new Size(628, 23);
+            pathLabel.Size = new Size(370, 23);
             pathLabel.TabIndex = 7;
             pathLabel.TextAlign = ContentAlignment.MiddleLeft;
             // 
@@ -95,36 +94,22 @@
             fileSTTTestButton.UseVisualStyleBackColor = true;
             fileSTTTestButton.Click += fileSTTTestButton_Click;
             // 
-            // volumeMeter1
-            // 
-            volumeMeter1.Amplitude = 0F;
-            volumeMeter1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            volumeMeter1.ForeColor = Color.LawnGreen;
-            volumeMeter1.Location = new Point(12, 142);
-            volumeMeter1.MaxDb = 0F;
-            volumeMeter1.MinDb = -60F;
-            volumeMeter1.Name = "volumeMeter1";
-            volumeMeter1.Orientation = Orientation.Horizontal;
-            volumeMeter1.Size = new Size(678, 38);
-            volumeMeter1.TabIndex = 1;
-            volumeMeter1.Text = "volumeMeter1";
-            // 
             // listBox1
             // 
             listBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             listBox1.FormattingEnabled = true;
             listBox1.ItemHeight = 15;
-            listBox1.Location = new Point(12, 186);
+            listBox1.Location = new Point(12, 141);
             listBox1.Name = "listBox1";
-            listBox1.Size = new Size(675, 274);
+            listBox1.Size = new Size(417, 214);
             listBox1.TabIndex = 9;
             // 
             // statusStrip1
             // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { statusLabel1 });
-            statusStrip1.Location = new Point(0, 468);
+            statusStrip1.Location = new Point(0, 375);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(699, 22);
+            statusStrip1.Size = new Size(441, 22);
             statusStrip1.TabIndex = 10;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -138,7 +123,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(699, 490);
+            ClientSize = new Size(441, 397);
             Controls.Add(statusStrip1);
             Controls.Add(listBox1);
             Controls.Add(fileSTTTestButton);
@@ -146,10 +131,8 @@
             Controls.Add(label1);
             Controls.Add(fileOpenButton);
             Controls.Add(micButton);
-            Controls.Add(volumeMeter1);
             Name = "MainForm";
             Text = "WaktaverseSTT";
-            SizeChanged += MainForm_SizeChanged;
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
             ResumeLayout(false);
@@ -163,7 +146,6 @@
         private Label label1;
         private Label pathLabel;
         private Button fileSTTTestButton;
-        private NAudio.Gui.VolumeMeter volumeMeter1;
         private ListBox listBox1;
         private StatusStrip statusStrip1;
         private ToolStripStatusLabel statusLabel1;
